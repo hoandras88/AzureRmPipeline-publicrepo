@@ -17,7 +17,7 @@ steps:
     subscriptionId: 'a441b835-c32d-4807-a1b6-07dcc401b158'
     action: 'Create Or Update Resource Group'
     resourceGroupName: 'rg-halab-test-001'
-    location: 'West EU'
+#    location: 'West EU'
     templateLocation: 'URL of the file'
     csmFileLink: 'https://raw.githubusercontent.com/hoandras88/AzureRmPipeline-publicrepo/main/template.json'
     csmParametersFileLink: 'https://raw.githubusercontent.com/hoandras88/AzureRmPipeline-publicrepo/main/parameters.json'
