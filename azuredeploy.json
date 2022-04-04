@@ -1,102 +1,48 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "metadata": {
-    "_generator": {
-      "name": "bicep",
-      "version": "0.4.1124.51302",
-      "templateHash": "18185082675760208473"
-    }
-  },
-  "parameters": {
-    "webAppName": {
-      "type": "string",
-      "defaultValue": "[format('webApp-{0}', uniqueString(resourceGroup().id))]",
-      "minLength": 2,
-      "metadata": {
-        "description": "Web app name."
-      }
-    },
-    "location": {
-      "type": "string",
-      "defaultValue": "[resourceGroup().location]",
-      "metadata": {
-        "description": "Location for all resources."
-      }
-    },
-    "sku": {
-      "type": "string",
-      "defaultValue": "F1",
-      "metadata": {
-        "description": "The SKU of App Service Plan."
-      }
-    },
-    "linuxFxVersion": {
-      "type": "string",
-      "defaultValue": "DOTNETCORE|3.0",
-      "metadata": {
-        "description": "The Runtime stack of current web app"
-      }
-    },
-    "repoUrl": {
-      "type": "string",
-      "defaultValue": " ",
-      "metadata": {
-        "description": "Optional Git Repo URL"
-      }
-    }
-  },
-  "variables": {
-    "appServicePlanPortalName": "[format('AppServicePlan-{0}', parameters('webAppName'))]"
-  },
-  "resources": [
-    {
-      "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2021-02-01",
-      "name": "[variables('appServicePlanPortalName')]",
-      "location": "[parameters('location')]",
-      "sku": {
-        "name": "[parameters('sku')]"
-      },
-      "kind": "linux",
-      "properties": {
-        "reserved": true
-      }
-    },
-    {
-      "type": "Microsoft.Web/sites",
-      "apiVersion": "2021-02-01",
-      "name": "[parameters('webAppName')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "httpsOnly": true,
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanPortalName'))]",
-        "siteConfig": {
-          "linuxFxVersion": "[parameters('linuxFxVersion')]",
-          "minTlsVersion": "1.2",
-          "ftpsState": "FtpsOnly"
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "variables": {},
+    "resources": [
+        {
+            "apiVersion": "2018-11-01",
+            "name": "wa-halab-test-001",
+            "type": "Microsoft.Web/sites",
+            "location": "West Europe",
+            "tags": {},
+            "dependsOn": [
+                "[concat('Microsoft.Web/serverfarms/', as-halab-test-001)]"
+            ],
+            "properties": {
+                "name": "wa-halab-test-001",
+                "siteConfig": {
+                    "appSettings": [],
+                    "linuxFxVersion": "DOTNETCORE|5.0",
+                    "alwaysOn": false
+                },
+                "serverFarmId": "[concat('/subscriptions/', a441b835-c32d-4807-a1b6-07dcc401b158,'/resourcegroups/', rg-halab-test-001, '/providers/Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]",
+                "clientAffinityEnabled": false
+            }
+        },
+        {
+            "apiVersion": "2018-11-01",
+            "name": "as-halab-test-001",
+            "type": "Microsoft.Web/serverfarms",
+            "location": "West Europe",
+            "kind": "linux",
+            "tags": {},
+            "dependsOn": [],
+            "properties": {
+                "name": "as-halab-test-001",
+                "workerSize": "0",
+                "workerSizeId": "0",
+                "numberOfWorkers": "1",
+                "reserved": true,
+                "zoneRedundant": false
+            },
+            "sku": {
+                "Tier": "Free",
+                "Name": "F1"
+            }
         }
-      },
-      "identity": {
-        "type": "SystemAssigned"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanPortalName'))]"
-      ]
-    },
-    {
-      "condition": "[contains(parameters('repoUrl'), 'http')]",
-      "type": "Microsoft.Web/sites/sourcecontrols",
-      "apiVersion": "2021-02-01",
-      "name": "[format('{0}/{1}', parameters('webAppName'), 'web')]",
-      "properties": {
-        "repoUrl": "[parameters('repoUrl')]",
-        "branch": "master",
-        "isManualIntegration": true
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
-      ]
-    }
-  ]
+    ]
 }
